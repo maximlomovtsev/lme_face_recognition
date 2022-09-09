@@ -2,6 +2,12 @@
 
 #include "figure.h"
 
+#include <stack>
+#include <memory>
+#include <algorithm>
+#include <iostream>
+#include <vector>
+
 namespace lme
 {
 namespace face_recognition

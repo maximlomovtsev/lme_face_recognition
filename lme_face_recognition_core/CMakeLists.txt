@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.21.2)
 project(lme_face_recognition_core)
 
 set(SOURCES
-    # impl/image.cpp
-    # impl/recognition_engine_impl.cpp
+    impl/image.cpp
+    impl/recognition_engine_impl.cpp
     model/rectangle.cpp
 )
 

@@ -2,7 +2,8 @@
 
 #include "image.h"
 
-#include <wingdi.h>
+#include <sstream>
+#include <Windows.h>
 
 namespace lme
 {
@@ -19,30 +20,52 @@ Image::Image(const std::string& path)
 
 void Image::Read(const std::string& path)
 {
-    image_.open(path.c_str(), std::ios_base::binary);
-    if(!image_.is_open())
+    std::ifstream image;
+    image.open(path.c_str(), std::ios_base::binary);
+    if(!image.is_open())
     {
         throw std::runtime_error("Not opened");
     }
-    if(image_.bad())
+    if(image.bad())
     {
         throw std::runtime_error("Bad file");
     }
-    if(image_.fail())
+    if(image.fail())
     {
         throw std::runtime_error("Fail file");
     }
+    std::stringstream data;
+    data << image.rdbuf();
+    image_ = data.str();
 }
 
-std::ifstream& Image::GetImage()
+std::string Image::GetImage() const
 {
     return image_;
 }
 
-std::tuple<uint8_t, uint8_t> Image::GetImageResolution() const
+std::tuple<uint32_t, uint32_t> Image::GetImageResolution() const
 {
-    BITMAPINFOHEADER header{};
-    return {};
+    BITMAPFILEHEADER header{};
+    image_.copy((char*)&header, sizeof(header));
+    if(header.bfType != 19778) // 19778 == 0x4D42 - BMP file signature
+    {
+        return {};
+    }
+
+    BITMAPINFOHEADER infoHeader{};
+    image_.copy((char*)&infoHeader, sizeof(infoHeader), sizeof(BITMAPFILEHEADER));
+    if(sizeof(infoHeader) != infoHeader.biSize)
+    {
+        return {};
+    }
+
+    return {infoHeader.biHeight, infoHeader.biWidth * 3 * 2};
+}
+
+uint32_t Image::GetImageDataOffset() const
+{
+    return sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
 }
 
 } // namespace core

@@ -20,12 +20,14 @@ public:
 
     void Read(const std::string& path);
 
-    std::ifstream& GetImage();
+    std::string GetImage() const;
 
-    std::tuple<uint8_t, uint8_t> GetImageResolution() const;
+    std::tuple<uint32_t, uint32_t> GetImageResolution() const;
+
+    uint32_t GetImageDataOffset() const;
 
 private:
-    std::ifstream image_;
+    std::string image_;
 };
 
 } // namespace core
